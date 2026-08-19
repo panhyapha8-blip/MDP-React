@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuthContext } from "../context/AuthContext";
-import Border from "./Border";           // ← add
-import LikeButton from "./LikeButton";   // ← add
-import CommentsModal from "./CommentsModal"; // ← add
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -13,10 +10,6 @@ export default function ShareModal({ post, open, onClose }) {
   const [recipient, setRecipient] = useState("");
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
-  const [flipped, setFlipped] = useState(false);
-  const [commentsOpen, setCommentsOpen] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
-
 
   if (!open) return null;
 
@@ -37,11 +30,11 @@ export default function ShareModal({ post, open, onClose }) {
     setStatus("");
 
     if (!user?.email) {
-      setStatus("Please Log in to Share!");
+      setStatus("Please log in to share!");
       return;
     }
     if (!recipient.trim()) {
-      setStatus("Whose Email");
+      setStatus("Recipient email required");
       return;
     }
 
@@ -57,9 +50,9 @@ export default function ShareModal({ post, open, onClose }) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed Sharing");
+      if (!res.ok) throw new Error(data.error || "Failed sharing");
 
-      setStatus("Succeeded Sharing!");
+      setStatus("Succeeded sharing!");
       setRecipient("");
     } catch (err) {
       setStatus(err.message);
@@ -68,26 +61,24 @@ export default function ShareModal({ post, open, onClose }) {
     }
   };
 
-  // ★★★ ប្រើ Portal ដើម្បីលោតចេញពីកាត ★★★
   return createPortal(
-    <div
-      className="info-overlay"
-      onClick={(e) => {
-        e.stopPropagation();
-        onClose();
-      }}
-    >
+    <div className="info-overlay">
       <div
         className="info-modal"
         onClick={(e) => e.stopPropagation()}
         style={{ maxWidth: 480 }}
       >
-        <button className="info-modal-close" onClick={onClose} aria-label="Close">
+        <button
+          className="info-modal-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
           &times;
         </button>
 
         <h2>{post.author_name}</h2>
 
+        {/* Share Link Section */}
         <div style={{ margin: "16px 0" }}>
           <label style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
             Link
@@ -133,6 +124,7 @@ export default function ShareModal({ post, open, onClose }) {
           }}
         />
 
+        {/* Share via Message Section */}
         <form
           onSubmit={handleShareViaMessage}
           style={{ display: "flex", flexDirection: "column", gap: 8 }}
@@ -142,7 +134,7 @@ export default function ShareModal({ post, open, onClose }) {
           </label>
           <input
             type="email"
-            placeholder="Who Email"
+            placeholder="Recipient email"
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
             style={{
