@@ -176,18 +176,6 @@
   line-height: 1.35;
 }
 
-.font-scale-value {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 1px 8px;
-  border-radius: 6px;
-  background: rgba(236, 204, 76, 0.15);
-  color: #f4d65f;
-  font-size: 0.8rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
 /* Selects & time inputs */
 .setting-row select,
 .setting-row input[type='time'] {
