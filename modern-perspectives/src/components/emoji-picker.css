@@ -1,0 +1,66 @@
+.emoji-picker-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.emoji-picker-panel {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(0%);
+  width: 300px !important;
+  height: 320px !important;
+  margin-top: 8px;
+  z-index: 100;
+  background: rgba(8, 12, 24, 0.97);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.emoji-picker-panel .EmojiPickerReact {
+  --epr-bg-color: transparent;
+  --epr-category-label-bg-color: rgba(255, 255, 255, 0.04);
+  border: none !important;
+  width: 100% !important;
+}
+
+.emoji-picker-panel button {
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+.messages-send-form .emoji-btn,
+button.emoji-btn  {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: linear-gradient(135deg, #f5c518, #ffe08a);
+  border: none;
+  border-radius: 10px;
+  color: #01011d;            /* ពណ៌ងងឹត ដើម្បីលេចធ្លោលើផ្ទៃលឿង */
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.messages-send-form .emoji-btn:hover,
+button.emoji-btn:hover  {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.emoji-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+}

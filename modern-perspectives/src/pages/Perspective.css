@@ -1,0 +1,203 @@
+/* ===== Page layout ===== */
+.perspective-page {
+  min-height: 100vh;
+  background: transparent;
+  color: #f1f1f1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.perspective-back-btn {
+  align-self: flex-start;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background 0.2s, transform 0.15s;
+  z-index: 10;
+}
+
+.perspective-back-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+  transform: translateY(-1px);
+}
+
+.perspective-error {
+  color: #ff8080;
+  margin-top: 60px;
+}
+
+/* ===== Background video ===== */
+#bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.9;
+}
+
+/* ===== Flip card – glass, fits the sea bg ===== */
+.perspective-page .card-scene {
+  width: 100%;
+  max-width: 340px;
+  perspective: 1000px;
+  cursor: pointer;
+  margin: 0 auto;
+  transition: transform 0.35s ease;
+}
+
+.perspective-page .card-scene:hover {
+  transform: scale(1.025);
+}
+
+.perspective-page .card-inner {
+  width: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  min-height: 480px;
+}
+
+.perspective-page .card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.perspective-page .card-front,
+.perspective-page .card-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(15, 25, 30, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ----- Front ----- */
+.perspective-page .card-front {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 480px;
+}
+
+.perspective-page .card-front img {
+  width: 100%;
+  aspect-ratio: 3 / 3.55;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.perspective-page .card-front article {
+  padding: 18px 22px 24px;
+  text-align: center;
+  background: transparent;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.perspective-page .card-front h3 {
+  margin: 0 0 10px;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f5f0e6;
+  letter-spacing: 0.2px;
+  line-height: 1.3;
+}
+
+.perspective-page .card-front .p,
+.perspective-page .card-front q {
+  margin: 0;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #d8d0c0;
+  line-height: 1.5;
+  quotes: """ """;
+}
+
+.perspective-page .card-front q::before {
+  content: open-quote;
+}
+
+.perspective-page .card-front q::after {
+  content: close-quote;
+}
+
+/* ----- Back ----- */
+.perspective-page .card-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 24px 20px;
+  color: #f0ece0;
+  background: rgba(15, 25, 30, 0.45);
+}
+
+.perspective-page .card-back .text-center {
+  margin: 0;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #f0ece0;
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+}
+
+/* Like / Comment / Share row */
+.perspective-actions,
+.perspective-actions button {
+  color: #e8e2d5;
+}
+
+.perspective-page .card-back-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.perspective-page .card-back-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: #e8e2d5;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+
+.perspective-page .card-back-actions button:hover {
+  color: #fff;
+}
