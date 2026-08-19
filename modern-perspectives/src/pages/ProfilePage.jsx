@@ -27,7 +27,7 @@ const CAMERA = (
 
 // ---- security config -------------------------------------------------
 const MAX_NAME_LEN = 50;
-const MAX_AVATAR_BYTES = 2 * 1024 * 1024; // 2 MB
+const MAX_AVATAR_BYTES = 7 * 1024 * 1024; // 7 MB
 const MAX_SAVE_ATTEMPTS = 5;
 const LOCKOUT_MS = 30_000; // 30s client-side cooldown after repeated failures
 
