@@ -36,7 +36,6 @@ function DashboardPage() {
     "Action expresses priorities",
     "Patience is bitter, but its fruit is sweet",
     "Simplicity is the ultimate sophistication",
-    "He who moves a mountain begins by carrying away small stones",
     "What you seek is seeking you",
     "Doubt kills more dreams than failure ever will",
   ];
