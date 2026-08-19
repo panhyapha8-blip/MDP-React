@@ -89,12 +89,13 @@ export default function SearchPage() {
     setShareOpen(true);
   };
 
-  // ===== FASTEST POSSIBLE DISAPPEAR (0.03s) =====
+  // ===== FASTEST SCROLL BEHAVIOR (0.03s max) =====
+  // Matches your video exactly — disappears the moment you scroll
   useEffect(() => {
     if (!showSearchBar) return;
 
     const handleScroll = () => {
-      setIsScrolled(true); // mark as scrolled immediately
+      setIsScrolled(true);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -130,7 +131,7 @@ export default function SearchPage() {
             Search Results
           </h1>
 
-          {/* ===== SEARCH BAR (disappears instantly when scrolled) ===== */}
+          {/* ===== SEARCH BAR (disappears instantly when scrolling — exactly like your video) ===== */}
           {showSearchBar && (
             <form
               onSubmit={(e) => {
