@@ -6,7 +6,6 @@ import LikeButton from '../components/LikeButton';
 import CommentsModal from '../components/CommentsModal';
 import ShareModal from '../components/ShareModal';
 import { scientists } from '../data/scientists';
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 export default function SearchPage() {
@@ -23,11 +22,22 @@ export default function SearchPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); // { type: 'post' | 'scientist', data: ... }
 
+  // ===== SEARCH BAR STATE =====
+  // When query exists (URL has ?q=...), show full search bar immediately.
+  // When query is empty, hide it and show only the Search button.
+  const [showSearchBar, setShowSearchBar] = useState(!!query);
+
+  // Track scroll position
+  const [isScrolled, setIsScrolled] = useState(false);
+
   useEffect(() => {
     if (!query) {
       setPosts([]);
+      setShowSearchBar(false); // Hide search bar when no query in URL
       return;
     }
+
+    setShowSearchBar(true); // Show search bar when there is a query in URL
 
     const fetchPosts = async () => {
       setLoading(true);
@@ -83,17 +93,101 @@ export default function SearchPage() {
     setShareOpen(true);
   };
 
+  // ===== SCROLL BEHAVIOR (HIDE SEARCH BAR WHEN SCROLLING) =====
+  useEffect(() => {
+    if (!showSearchBar) return; // Only attach listener when search bar is visible
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [showSearchBar]);
+
   return (
     <>
       <Header />
 
       <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 20px' }}>
-        {/* Header */}
+        {/* ===== HEADER SEARCH (FULL BAR OR BUTTON) ===== */}
         <div style={{ marginBottom: 30 }}>
           <h1 style={{ color: '#ffe88a', fontSize: 28, marginBottom: 8 }}>
             Search Results
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16 }}>
+
+          {/* Full search bar (visible when showSearchBar === true) */}
+          {showSearchBar && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const input = document.querySelector('#search-input');
+                const newQuery = input?.value.trim();
+                if (newQuery) {
+                  navigate(`/search?q=${encodeURIComponent(newQuery)}`, { replace: true });
+                }
+              }}
+              style={{ position: 'relative', marginTop: 12 }}
+            >
+              <input
+                id="search-input"
+                type="text"
+                defaultValue={query}
+                placeholder="Search scientists, quotes, posts..."
+                style={{
+                  width: '100%',
+                  padding: '14px 20px 14px 52px',
+                  background: 'rgba(6, 18, 31, 0.7)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  borderRadius: 999,
+                  color: '#fff',
+                  fontSize: '16px',
+                  outline: 'none',
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  position: 'absolute',
+                  left: '14px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#d4af37',
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                }}
+              >
+                🔍
+              </button>
+            </form>
+          )}
+
+          {/* Search button (visible when showSearchBar === false) */}
+          {!showSearchBar && (
+            <button
+              onClick={() => setShowSearchBar(true)}
+              style={{
+                marginTop: 12,
+                padding: '14px 28px',
+                background: 'linear-gradient(90deg, #d4af37, #ffe88a)',
+                color: '#06121f',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: 999,
+                cursor: 'pointer',
+                fontSize: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              🔍 Search scientists & posts
+            </button>
+          )}
+
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, marginTop: 16 }}>
             {query ? (
               <>
                 Results for: <strong style={{ color: '#d4af37' }}>"{query}"</strong>
@@ -104,7 +198,7 @@ export default function SearchPage() {
                 )}
               </>
             ) : (
-              'Please enter a search term'
+              'Enter a search term above to find scientists or user perspectives'
             )}
           </p>
         </div>
@@ -155,7 +249,6 @@ export default function SearchPage() {
                 const imageUrl = post.image_url?.startsWith('http')
                   ? post.image_url
                   : `${API_BASE}${post.image_url}`;
-
                 return (
                   <div
                     key={`post-${post.id}`}
@@ -187,7 +280,6 @@ export default function SearchPage() {
                       <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 12px 0', fontSize: 14 }}>
                         {post.description}
                       </p>
-
                       {/* Like + Comment + Share */}
                       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                         <LikeButton targetType="post" targetId={post.id} />
@@ -268,7 +360,6 @@ export default function SearchPage() {
                       {s.bio?.slice(0, 180)}
                       {s.bio?.length > 180 ? '...' : ''}
                     </p>
-
                     {/* Like + Comment + Share */}
                     <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                       <LikeButton targetType="scientist" targetId={s.id} />
@@ -340,7 +431,6 @@ export default function SearchPage() {
             open={commentsOpen}
             onClose={() => setCommentsOpen(false)}
           />
-
           <ShareModal
             post={
               selectedItem.type === 'post'
