@@ -11,10 +11,21 @@ export default function ScientistCard({ scientist }) {
   const [shareOpen, setShareOpen] = useState(false);
 
   return (
-    <div className="card-scene" onClick={() => setFlipped((f) => !f)}>
+    <div 
+      className="card-scene" 
+      onClick={() => setFlipped((f) => !f)} 
+      role="button" 
+      aria-pressed={flipped}
+    >
       <div className={`card-inner${flipped ? ' flipped' : ''}`}>
+        {/* Front */}
         <div className="card-front">
-          <img src={scientist.img} alt={scientist.name} title={scientist.bio} />
+          <img 
+            src={scientist.img} 
+            alt={scientist.name} 
+            title={scientist.bio} 
+            loading="lazy"
+          />
           <article>
             <h3 style={{ marginTop: '2%', color: '#000000' }}>
               {scientist.name}
@@ -26,6 +37,7 @@ export default function ScientistCard({ scientist }) {
           </article>
         </div>
 
+        {/* Back */}
         <div className="card-back">
           <p
             className="text-center"
@@ -57,6 +69,7 @@ export default function ScientistCard({ scientist }) {
                 e.stopPropagation();
                 setCommentsOpen(true);
               }}
+              aria-label="Open comments"
               style={{
                 background: 'none',
                 border: 'none',
@@ -72,7 +85,11 @@ export default function ScientistCard({ scientist }) {
             </button>
 
             <button
-              onClick={(e) => { e.stopPropagation(); setShareOpen(true); }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                setShareOpen(true); 
+              }}
+              aria-label="Open share modal"
               style={{ 
                 background:'none', 
                 border:'none', 
@@ -81,7 +98,8 @@ export default function ScientistCard({ scientist }) {
                 fontSize:13, 
                 color:'#1a1a1a', 
                 textDecoration:'underline', 
-                padding:0 }}
+                padding:0 
+              }}
             >
               🔗 Share
             </button>
@@ -89,6 +107,7 @@ export default function ScientistCard({ scientist }) {
         </div>
       </div>
 
+      {/* Comments Modal */}
       <CommentsModal
         targetType="scientist"
         targetId={scientist.id}
@@ -98,15 +117,18 @@ export default function ScientistCard({ scientist }) {
         onClose={() => setCommentsOpen(false)}
       />
 
+      {/* Share Modal with full props */}
       <ShareModal 
         post={{
           id: scientist.id,
           author_name: scientist.name,
+          bio: scientist.bio,
+          quote: scientist.quote,
+          img: scientist.img,
         }} 
         open={shareOpen} 
         onClose={() => setShareOpen(false)} 
       />
-      
     </div>
   );
 }
