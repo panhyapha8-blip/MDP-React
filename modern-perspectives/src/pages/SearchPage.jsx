@@ -22,22 +22,20 @@ export default function SearchPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // ===== SEARCH BAR + BUTTON STATE =====
-  // When query exists in URL → full search bar + Search button is visible
-  // When query is empty → ONLY the Search button remains (search bar disappears)
+  // ===== SEARCH BAR STATE =====
   const [showSearchBar, setShowSearchBar] = useState(!!query);
 
-  // Scroll detection for hiding the bar
+  // Scroll detection
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     if (!query) {
       setPosts([]);
-      setShowSearchBar(false); // Hide search bar when no query
+      setShowSearchBar(false);
       return;
     }
 
-    setShowSearchBar(true); // Show full bar + button when query exists
+    setShowSearchBar(true);
 
     const fetchPosts = async () => {
       setLoading(true);
@@ -59,7 +57,6 @@ export default function SearchPage() {
     fetchPosts();
   }, [query]);
 
-  // Filter posts
   const filteredPosts = posts.filter((p) => {
     const name = (p.author_name || '').toLowerCase();
     const slogan = (p.slogan || '').toLowerCase();
@@ -67,7 +64,6 @@ export default function SearchPage() {
     return name.includes(query) || slogan.includes(query) || desc.includes(query);
   });
 
-  // Filter scientists
   const filteredScientists = scientists.filter((s) => {
     const name = (s.name || '').toLowerCase();
     const quote = (s.quote || '').toLowerCase();
@@ -93,16 +89,34 @@ export default function SearchPage() {
     setShareOpen(true);
   };
 
-  // Scroll behavior (hide bar when scrolling)
+  // ===== FASTEST POSSIBLE DISAPPEAR (0.03s) =====
   useEffect(() => {
     if (!showSearchBar) return;
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(true); // mark as scrolled immediately
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, [showSearchBar]);
+
+  // ===== CLICK OUTSIDE TO SHOW BAR (instant) =====
+  useEffect(() => {
+    if (showSearchBar) return;
+
+    const handleClickOutside = (e) => {
+      const button = document.querySelector('#search-button');
+      const input = document.querySelector('#search-input');
+
+      if (button && button.contains(e.target)) return;
+      if (input && input.contains(e.target)) return;
+
+      setShowSearchBar(true);
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [showSearchBar]);
 
   return (
@@ -116,7 +130,7 @@ export default function SearchPage() {
             Search Results
           </h1>
 
-          {/* ===== SEARCH BAR (disappears when scrolled) ===== */}
+          {/* ===== SEARCH BAR (disappears instantly when scrolled) ===== */}
           {showSearchBar && (
             <form
               onSubmit={(e) => {
@@ -167,6 +181,7 @@ export default function SearchPage() {
           {/* ===== GOLD SEARCH BUTTON (always visible, disappears when bar is gone) ===== */}
           {!showSearchBar && (
             <button
+              id="search-button"
               onClick={() => setShowSearchBar(true)}
               style={{
                 marginTop: 12,
