@@ -20,24 +20,24 @@ export default function SearchPage() {
   // For modals
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null); // { type: 'post' | 'scientist', data: ... }
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  // ===== SEARCH BAR STATE =====
-  // When query exists (URL has ?q=...), show full search bar immediately.
-  // When query is empty, hide it and show only the Search button.
+  // ===== SEARCH BAR + BUTTON STATE =====
+  // When query exists in URL → full search bar + Search button is visible
+  // When query is empty → ONLY the Search button remains (search bar disappears)
   const [showSearchBar, setShowSearchBar] = useState(!!query);
 
-  // Track scroll position
+  // Scroll detection for hiding the bar
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     if (!query) {
       setPosts([]);
-      setShowSearchBar(false); // Hide search bar when no query in URL
+      setShowSearchBar(false); // Hide search bar when no query
       return;
     }
 
-    setShowSearchBar(true); // Show search bar when there is a query in URL
+    setShowSearchBar(true); // Show full bar + button when query exists
 
     const fetchPosts = async () => {
       setLoading(true);
@@ -93,9 +93,9 @@ export default function SearchPage() {
     setShareOpen(true);
   };
 
-  // ===== SCROLL BEHAVIOR (HIDE SEARCH BAR WHEN SCROLLING) =====
+  // Scroll behavior (hide bar when scrolling)
   useEffect(() => {
-    if (!showSearchBar) return; // Only attach listener when search bar is visible
+    if (!showSearchBar) return;
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -110,13 +110,13 @@ export default function SearchPage() {
       <Header />
 
       <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 20px' }}>
-        {/* ===== HEADER SEARCH (FULL BAR OR BUTTON) ===== */}
+        {/* Header */}
         <div style={{ marginBottom: 30 }}>
           <h1 style={{ color: '#ffe88a', fontSize: 28, marginBottom: 8 }}>
             Search Results
           </h1>
 
-          {/* Full search bar (visible when showSearchBar === true) */}
+          {/* ===== SEARCH BAR (disappears when scrolled) ===== */}
           {showSearchBar && (
             <form
               onSubmit={(e) => {
@@ -133,7 +133,7 @@ export default function SearchPage() {
                 id="search-input"
                 type="text"
                 defaultValue={query}
-                placeholder="Search scientists, quotes, posts..."
+                placeholder="Search perspectives — scientists or posts..."
                 style={{
                   width: '100%',
                   padding: '14px 20px 14px 52px',
@@ -164,26 +164,27 @@ export default function SearchPage() {
             </form>
           )}
 
-          {/* Search button (visible when showSearchBar === false) */}
+          {/* ===== GOLD SEARCH BUTTON (always visible, disappears when bar is gone) ===== */}
           {!showSearchBar && (
             <button
               onClick={() => setShowSearchBar(true)}
               style={{
                 marginTop: 12,
-                padding: '14px 28px',
+                padding: '14px 32px',
                 background: 'linear-gradient(90deg, #d4af37, #ffe88a)',
                 color: '#06121f',
                 fontWeight: 700,
                 border: 'none',
                 borderRadius: 999,
                 cursor: 'pointer',
-                fontSize: '16px',
+                fontSize: '17px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
+                boxShadow: '0 4px 12px rgba(212, 175, 55, 0.3)',
               }}
             >
-              🔍 Search scientists & posts
+              🔍 Search
             </button>
           )}
 
@@ -416,7 +417,7 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* ===== Modals ===== */}
+      {/* Modals */}
       {selectedItem && (
         <>
           <CommentsModal
