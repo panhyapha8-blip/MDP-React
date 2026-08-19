@@ -2,7 +2,10 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import { scientists } from '../data/scientists';   // ← static scientists
+import LikeButton from '../components/LikeButton';
+import CommentsModal from '../components/CommentsModal';
+import ShareModal from '../components/ShareModal';
+import { scientists } from '../data/scientists';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -15,7 +18,11 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Fetch all posts from Railway, then filter on frontend
+  // For modals
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null); // { type: 'post' | 'scientist', data: ... }
+
   useEffect(() => {
     if (!query) {
       setPosts([]);
@@ -42,16 +49,12 @@ export default function SearchPage() {
     fetchPosts();
   }, [query]);
 
-  // Filter user posts
+  // Filter posts
   const filteredPosts = posts.filter((p) => {
     const name = (p.author_name || '').toLowerCase();
     const slogan = (p.slogan || '').toLowerCase();
     const desc = (p.description || '').toLowerCase();
-    return (
-      name.includes(query) ||
-      slogan.includes(query) ||
-      desc.includes(query)
-    );
+    return name.includes(query) || slogan.includes(query) || desc.includes(query);
   });
 
   // Filter scientists
@@ -69,6 +72,16 @@ export default function SearchPage() {
   });
 
   const totalResults = filteredPosts.length + filteredScientists.length;
+
+  const openComments = (type, data) => {
+    setSelectedItem({ type, data });
+    setCommentsOpen(true);
+  };
+
+  const openShare = (type, data) => {
+    setSelectedItem({ type, data });
+    setShareOpen(true);
+  };
 
   return (
     <>
@@ -96,13 +109,8 @@ export default function SearchPage() {
           </p>
         </div>
 
-        {loading && (
-          <p style={{ color: '#d4af37', textAlign: 'center' }}>Searching...</p>
-        )}
-
-        {error && (
-          <p style={{ color: '#ff6b6b', textAlign: 'center' }}>{error}</p>
-        )}
+        {loading && <p style={{ color: '#d4af37', textAlign: 'center' }}>Searching...</p>}
+        {error && <p style={{ color: '#ff6b6b', textAlign: 'center' }}>{error}</p>}
 
         {/* No results */}
         {!loading && !error && query && totalResults === 0 && (
@@ -136,7 +144,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* ===== User Posts Results ===== */}
+        {/* ===== User Posts ===== */}
         {!loading && filteredPosts.length > 0 && (
           <section style={{ marginBottom: 40 }}>
             <h2 style={{ color: '#d4af37', fontSize: 20, marginBottom: 16 }}>
@@ -164,15 +172,10 @@ export default function SearchPage() {
                       <img
                         src={imageUrl}
                         alt={post.author_name}
-                        style={{
-                          width: 70,
-                          height: 70,
-                          objectFit: 'cover',
-                          borderRadius: 10,
-                        }}
+                        style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 10 }}
                       />
                     )}
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <h3 style={{ color: '#ffe88a', margin: '0 0 4px 0', fontSize: 17 }}>
                         {post.author_name}
                       </h3>
@@ -181,9 +184,40 @@ export default function SearchPage() {
                           "{post.slogan}"
                         </p>
                       )}
-                      <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0, fontSize: 14 }}>
+                      <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 12px 0', fontSize: 14 }}>
                         {post.description}
                       </p>
+
+                      {/* Like + Comment + Share */}
+                      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                        <LikeButton targetType="post" targetId={post.id} />
+                        <button
+                          onClick={() => openComments('post', post)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#d4af37',
+                            cursor: 'pointer',
+                            fontSize: 13,
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          💬 Comment
+                        </button>
+                        <button
+                          onClick={() => openShare('post', post)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#d4af37',
+                            cursor: 'pointer',
+                            fontSize: 13,
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          🔗 Share
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -192,7 +226,7 @@ export default function SearchPage() {
           </section>
         )}
 
-        {/* ===== Scientists Results ===== */}
+        {/* ===== Scientists ===== */}
         {!loading && filteredScientists.length > 0 && (
           <section>
             <h2 style={{ color: '#d4af37', fontSize: 20, marginBottom: 16 }}>
@@ -215,26 +249,56 @@ export default function SearchPage() {
                     <img
                       src={s.img}
                       alt={s.name}
-                      style={{
-                        width: 70,
-                        height: 70,
-                        objectFit: 'cover',
-                        borderRadius: 10,
-                      }}
+                      style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 10 }}
                     />
                   )}
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <h3 style={{ color: '#ffe88a', margin: '0 0 4px 0', fontSize: 17 }}>
-                      {s.name} <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>({s.years})</span>
+                      {s.name}{' '}
+                      <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
+                        ({s.years})
+                      </span>
                     </h3>
                     {s.quote && (
                       <p style={{ color: '#d4af37', margin: '0 0 6px 0', fontStyle: 'italic', fontSize: 14 }}>
                         "{s.quote}"
                       </p>
                     )}
-                    <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0, fontSize: 14 }}>
-                      {s.bio?.slice(0, 180)}{s.bio?.length > 180 ? '...' : ''}
+                    <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 12px 0', fontSize: 14 }}>
+                      {s.bio?.slice(0, 180)}
+                      {s.bio?.length > 180 ? '...' : ''}
                     </p>
+
+                    {/* Like + Comment + Share */}
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                      <LikeButton targetType="scientist" targetId={s.id} />
+                      <button
+                        onClick={() => openComments('scientist', s)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#d4af37',
+                          cursor: 'pointer',
+                          fontSize: 13,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        💬 Comment
+                      </button>
+                      <button
+                        onClick={() => openShare('scientist', s)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#d4af37',
+                          cursor: 'pointer',
+                          fontSize: 13,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        🔗 Share
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -260,6 +324,37 @@ export default function SearchPage() {
           </button>
         </div>
       </div>
+
+      {/* ===== Modals ===== */}
+      {selectedItem && (
+        <>
+          <CommentsModal
+            targetType={selectedItem.type}
+            targetId={selectedItem.data.id}
+            title={
+              selectedItem.type === 'post'
+                ? selectedItem.data.author_name
+                : selectedItem.data.name
+            }
+            isOwner={false}
+            open={commentsOpen}
+            onClose={() => setCommentsOpen(false)}
+          />
+
+          <ShareModal
+            post={
+              selectedItem.type === 'post'
+                ? selectedItem.data
+                : {
+                    id: selectedItem.data.id,
+                    author_name: selectedItem.data.name,
+                  }
+            }
+            open={shareOpen}
+            onClose={() => setShareOpen(false)}
+          />
+        </>
+      )}
     </>
   );
 }
